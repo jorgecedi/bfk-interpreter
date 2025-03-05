@@ -118,7 +118,7 @@ class BfkEvaluator:
             self.ip += 1
 
     def op_print(self):
-        print(chr(self.cells[self.dp]))
+        print(chr(self.cells[self.dp]), end="")
 
     def op_read(self):
         ch = sys.stdin.read(1)

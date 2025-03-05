@@ -107,14 +107,12 @@ class BfkEvaluator:
 
     def op_jump_if_zero(self):
         if self.cells[self.dp] == 0:
-            # self.ip = self.ip + self.code[self.ip:].index("]") 
             self.ip = self.jump_if_zero[self.ip] + 1
         else:
             self.ip += 1
 
     def op_jump_if_non_zero(self):
         if self.cells[self.dp] != 0:
-            # self.ip = self.ip - self.code[:self.ip][::-1].index("[")
             self.ip = self.jump_if_not_zero[self.ip] + 1
         else:
             self.ip += 1

@@ -1,18 +1,18 @@
 import sys
 
+
 class BfkEvaluator:
-    counter:int = 0
+    counter: int = 0
     dp: int = 0
     ip: int = 0
-    cells = [0]*30000 # According to wikipedia it should be 30,000 cells
+    cells = [0] * 30000  # According to wikipedia it should be 30,000 cells
     code: str = ""
-    instruction_limit:int = 1000000
+    instruction_limit: int = 1000000
+    jump_if_zero = {}
+    jump_if_not_zero = {}
 
-    def check_for_balanced(self):
+    def map_jump_branches(self):
         stack = []
-        
-        self.jump_if_zero = {}
-        self.jump_if_not_zero = {}
 
         i = 0
         for t in self.code:
@@ -27,9 +27,9 @@ class BfkEvaluator:
         if len(stack) > 0:
             raise Exception("unbalanced error")
 
-    def tokenize(self, code:str):
+    def tokenize(self, code: str):
         allowed_inputs = ["+", "-", ">", "<", "[", "]", ".", ","]
-        self.code = code.replace("\n", "").replace("\r", "").replace(" ","")
+        self.code = code.replace("\n", "").replace("\r", "").replace(" ", "")
         new_code = ""
         for s in code:
             if s in allowed_inputs:
@@ -38,9 +38,10 @@ class BfkEvaluator:
         self.code = new_code
         print(self.code)
 
-    def eval_bfk(self):
-        self.check_for_balanced()
-        while(self.counter < self.instruction_limit and self.ip < len(self.code)):
+    def eval_bfk(self, code: str):
+        self.tokenize(code)
+        self.map_jump_branches()
+        while self.counter < self.instruction_limit and self.ip < len(self.code):
             token = self.code[self.ip]
 
             if token == "+":
@@ -66,12 +67,11 @@ class BfkEvaluator:
                 self.op_jump_if_non_zero()
 
             elif token == ".":
-                print(chr(self.cells[self.dp]))
+                self.op_print()
                 self.ip += 1
 
             elif token == ",":
-                ch = sys.stdin.read(1)
-                self.cells[self.dp] = ord(ch)
+                self.op_read()
                 self.ip += 1
 
             # Just to avoid running to infinity
@@ -81,7 +81,7 @@ class BfkEvaluator:
             print(f"Cells[{self.dp}] =  {self.cells[self.dp]}")
             print(f"Instruction pointer: {self.ip}")
             print("")
-            if self.dp < 0 :
+            if self.dp < 0:
                 print("PANIC, out of memory bounds")
                 return
 
@@ -113,10 +113,23 @@ class BfkEvaluator:
         else:
             self.ip += 1
 
+    def op_print(self):
+        print(chr(self.cells[self.dp]))
 
-evaluator = BfkEvaluator()
+    def op_read(self):
+        ch = sys.stdin.read(1)
+        self.cells[self.dp] = ord(ch)
 
-with open("adder.bfk", "r") as f:
-    code = f.read()
-    evaluator.tokenize(code)
-    evaluator.eval_bfk()
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python bfk.py <filename>")
+        sys.exit(1)
+
+    filename = sys.argv[1]
+
+    evaluator = BfkEvaluator()
+
+    with open(filename, "r") as f:
+        code = f.read()
+        evaluator.eval_bfk(code)

@@ -7,9 +7,13 @@ class BfkEvaluator:
     ip: int = 0
     cells = [0] * 30000  # According to wikipedia it should be 30,000 cells
     code: str = ""
-    instruction_limit: int = 1000000
+    instruction_limit: int = 1000000 # Just to avoid running to infinity
     jump_if_zero = {}
     jump_if_not_zero = {}
+    with_debug = False
+
+    def __init__(self, with_debug=False):
+        self.with_debug = with_debug
 
     def map_jump_branches(self):
         stack = []
@@ -77,10 +81,12 @@ class BfkEvaluator:
             # Just to avoid running to infinity
             self.counter += 1
 
-            print(f"Instruction: {token}")
-            print(f"Cells[{self.dp}] =  {self.cells[self.dp]}")
-            print(f"Instruction pointer: {self.ip}")
-            print("")
+            if self.with_debug:
+                print(f"Instruction: {token}")
+                print(f"Cells[{self.dp}] =  {self.cells[self.dp]}")
+                print(f"Instruction pointer: {self.ip}")
+                print("")
+
             if self.dp < 0:
                 print("PANIC, out of memory bounds")
                 return
@@ -128,7 +134,11 @@ if __name__ == "__main__":
 
     filename = sys.argv[1]
 
-    evaluator = BfkEvaluator()
+    debug = False
+    if len(sys.argv) > 2 and sys.argv[2] == "--debug":
+        debug = True
+
+    evaluator = BfkEvaluator(with_debug=debug)
 
     with open(filename, "r") as f:
         code = f.read()

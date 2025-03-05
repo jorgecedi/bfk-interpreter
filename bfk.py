@@ -32,7 +32,7 @@ class BfkEvaluator:
             raise Exception("unbalanced error")
 
     def tokenize(self, code: str):
-        allowed_inputs = ["+", "-", ">", "<", "[", "]", ".", ","]
+        allowed_inputs = "+-><[].,"
         self.code = code.replace("\n", "").replace("\r", "").replace(" ", "")
         new_code = ""
         for s in code:
